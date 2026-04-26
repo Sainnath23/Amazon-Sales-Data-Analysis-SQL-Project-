@@ -1,0 +1,97 @@
+#Which products drive most revenue?
+
+SELECT 
+    product_id,
+    ROUND(SUM(total_revenue),2) AS total_revenue
+FROM amazon_sales_dataset
+GROUP BY product_id
+ORDER BY total_revenue DESC
+LIMIT 10;
+
+
+#How does product price impact sales quantity?
+
+SELECT *,
+CASE 
+    WHEN discounted_price <= 200 THEN 'Low'
+    WHEN discounted_price <= 450 THEN 'Medium'
+    ELSE 'High'
+END AS price_category
+FROM amazon_sales_dataset;
+
+SELECT 
+    price_category,
+    AVG(quantity_sold) AS avg_quantity,
+    ROUND(AVG(total_revenue),2) AS avg_revenue
+FROM (
+    SELECT *,
+    CASE 
+        WHEN discounted_price <= 200 THEN 'Low'
+        WHEN discounted_price <= 450 THEN 'Medium'
+        ELSE 'High'
+    END AS price_category
+    FROM amazon_sales_dataset
+) t
+GROUP BY price_category;
+
+# Do discounts increase sales quantity?
+
+SELECT 
+    CASE 
+        WHEN discount_percent = 0 THEN 'No Discount'
+        WHEN discount_percent <= 15 THEN 'Low Discount'
+        ELSE 'High Discount'
+    END AS discount_category,
+    
+    AVG(quantity_sold) AS avg_quantity,
+    ROUND(AVG(total_revenue),2) AS avg_revenue
+
+FROM amazon_sales_dataset
+GROUP BY discount_category;
+
+#Do highly rated products generate higher revenue?
+SELECT 
+    CASE 
+        WHEN rating <= 3.5 THEN 'Low'
+        WHEN rating <= 4.5 THEN 'Medium'
+        ELSE 'High'
+    END AS rating_category,
+    
+    AVG(quantity_sold) AS avg_quantity,
+    ROUND(AVG(total_revenue),2) AS avg_revenue
+
+FROM amazon_sales_dataset
+GROUP BY rating_category;
+
+#Which regions generate the highest revenue?
+
+SELECT 
+    customer_region,
+    ROUND(SUM(total_revenue),2) AS total_revenue,
+    AVG(quantity_sold) AS avg_quantity
+FROM amazon_sales_dataset
+GROUP BY customer_region
+ORDER BY total_revenue DESC;
+
+#Do certain payment methods generate higher revenue?
+
+SELECT 
+    payment_method,
+   ROUND(SUM(total_revenue),2) AS total_revenue,
+    AVG(quantity_sold) AS avg_quantity
+FROM amazon_sales_dataset
+GROUP BY payment_method
+ORDER BY total_revenue DESC;
+
+-- FINAL BUSINESS INSIGHTS
+-- =====================================================
+
+-- 1. Revenue is concentrated among a small number of top-performing products
+-- 2. Discounts increase sales volume but are not always efficient for revenue
+-- 3. Higher-rated products tend to perform better, highlighting importance of customer trust
+-- 4. Some high-rated products generate low revenue, indicating growth opportunities
+-- 5. Certain categories perform well even without heavy discounts, showing pricing power
+-- 6. Pricing impacts both sales volume and revenue, requiring a balanced strategy
+
+-- =====================================================
+-- END OF PROJECT
